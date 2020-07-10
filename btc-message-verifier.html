@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Bitcoin Message Verifier</title>
+
+    <!-- Bitcoin message verifier -->
+    <script src="https://unpkg.com/btc-message-verifier"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <!-- Bootstrap scripts: JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="assets/style/msg-inspector.css">
+</head>
+<body style="background-color:#f5fff7">
+<div class="container p-2 p-lg-3 m-0" style="background-color:#353A94;max-width:100%">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col">
+            <p class="h3 text-white mb-0" style="font-family:Myriadpro-Bold">
+                <img src="assets/img/CompanyElement_SM_Darkbackgrounds.png" alt="Catenis logo" style="width:3rem;height:auto">&nbsp;&nbsp;Blockchain of Things
+            </p>
+        </div>
+        <div class="col-1 mt-2 mr-3">
+            <a class="text-white" href="https://github.com/blockchainofthings/BtcMessageVerifierWebApp" target="_blank" rel="noopener" aria-label="GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="navbar-nav-svg" viewBox="0 0 512 499.36" role="img"><title>GitHub</title><path fill="currentColor" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path></svg>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="container mt-2">
+    <div class="row mb-4">
+        <div class="col text-center text-muted">
+            <p class="h2">Bitcoin Message Verifier</p>
+        </div>
+    </div>
+    <div id="successMsgSec" class="row" hidden>
+        <div class="col text-center">
+            <div class="alert alert-success" role="alert">
+                Message successfully verified
+                <button type="button" class="close" aria-label="Close" onclick="hideSuccess()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="failureMsgSec" class="row" hidden>
+        <div class="col text-center">
+            <div class="alert alert-warning" role="alert">
+                Message could not be verified
+                <button type="button" class="close" aria-label="Close" onclick="hideFailure()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="errMsgSec" class="row" hidden>
+        <div class="col text-center">
+            <div class="alert alert-danger" role="alert">
+                <span id="errMsgFld"></span>
+                <button type="button" class="close" aria-label="Close" onclick="hideError()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-1"></div>
+        <div class="col text-center">
+            <form id="verifyFrm" onsubmit="verifyMessage();return false">
+                <div class="form-group">
+                    <input id="cryptoDataFld" name="cryptoData" type="text" class="form-control" autocomplete="off" placeholder="Bitcoin address">
+                    <div class="form-group text-left pl-1 pt-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cryptoDataType" id="addressRdb" value="address" checked onchange="changeCryptoDataType(this)">
+                            <label class="form-check-label" for="addressRdb">address</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cryptoDataType" id="pubKeyHashRdb" value="pubKeyHash" onchange="changeCryptoDataType(this)">
+                            <label class="form-check-label" for="pubKeyHashRdb">public key hash</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input id="signatureFld" name="signature" type="text" class="form-control" autocomplete="off" placeholder="Signature">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input id="messageFld" name="message" type="text" class="form-control" autocomplete="off" placeholder="Original message">
+                    </div>
+                </div>
+                <div class="form-group text-left">
+                    <select name="network" class="form-control form-control-sm form-inline" style="width:6rem; display:inline">
+                        <option value="bitcoin">Bitcoin</option>
+                        <option value="regtest">Regtest</option>
+                        <option value="testnet">Testnet</option>
+                    </select> Network
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Verify</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+<script>
+    function changeCryptoDataType(radioCtl) {
+        const type = radioCtl.form.cryptoDataType.value;
+        const label = type === 'address' ? 'Bitcoin address' : 'Public key hash';
+
+        $('#cryptoDataFld').prop('placeholder', label);
+    }
+    function hideElem(sel) {
+        const $el = $(sel)[0];
+        if ($el) {
+            $el.setAttribute('hidden', '');
+        }
+    }
+    function showElem(sel) {
+        $(sel).removeAttr('hidden');
+    }
+    function elemContent(sel, val) {
+        const $el = $(sel)[0];
+        if ($el) {
+            if (val) {
+                $el.innerText = val;
+            }
+            else {
+                return $el.innerText;
+            }
+        }
+    }
+    function showOption(fldName, checked) {
+        if (checked) {
+            hideElem($(`#${fldName} > svg.bi-square`));
+            showElem($(`#${fldName} > svg.bi-check-square`));
+        }
+        else {
+            hideElem($(`#${fldName} > svg.bi-check-square`));
+            showElem($(`#${fldName} > svg.bi-square`));
+        }
+    }
+    function showSuccess() {
+        showElem('#successMsgSec');
+    }
+    function hideSuccess(err) {
+        hideElem('#successMsgSec');
+    }
+    function showFailure() {
+        showElem('#failureMsgSec');
+    }
+    function hideFailure(err) {
+        hideElem('#failureMsgSec');
+    }
+    function showError(err) {
+        elemContent('#errMsgFld', err.message);
+        showElem('#errMsgSec');
+    }
+    function hideError(err) {
+        hideElem('#errMsgSec');
+        elemContent('#errMsgFld', '');
+    }
+
+    //const msgInspector = new ctnMsgInspector.MessageInspector({network:'testnet'});
+    const msgConst = {
+        maxExcerptLength: 1024,
+        minRemainBytes: 10
+    };
+    const msgInfo = {
+        displayMode: 'string',
+        remainBytes: 0,
+        showExcerpt: false
+    };
+    const docConst = {
+        maxOCMsgCids: 30
+    };
+    const docInfo = {
+        strOffChainCid: undefined,
+        reducedList: undefined,
+        showReduced: false
+    };
+
+    function verifyMessage() {
+        hideSuccess();
+        hideFailure();
+        hideError();
+        
+        const form = $('#verifyFrm')[0];
+
+        let cryptoData = form.cryptoData.value.trim();
+        const cryptoDataType = form.cryptoDataType.value;
+
+        if (cryptoDataType === 'pubKeyHash') {
+            cryptoData = btcMsgVerifier.Buffer.from(cryptoData, 'hex');
+        }
+
+        const signature = form.signature.value.trim();
+        const message = form.message.value.trim();
+        const network = form.network.value;
+
+        try {
+            const verified = btcMsgVerifier.verifyMessage(cryptoData, signature, message, network);
+
+            if (verified) {
+                showSuccess();
+            }
+            else {
+                showFailure();
+            }
+        }
+        catch (err) {
+            showError(err);
+        }
+    }
+</script>
+</body>
+</html>
